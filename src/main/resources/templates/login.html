@@ -111,6 +111,7 @@
                 messageEl.textContent = 'Login successful!';
                 console.log("Username:", username);
                 // Redirect or do something on success
+                sessionStorage.setItem('username', username);
                 if (username =="user"){
                     window.location.href = '/api/userDashboard';
                 }else {
