@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Admin Dashboard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(120deg, #74ebd5, #acb6e5);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 2rem;
+        }
+
+        .dashboard {
+            background-color: #fff;
+            padding: 30px 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            width: 1000px;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .button-group {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #4e9af1;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            margin: 0 10px 10px 0;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #357ae8;
+        }
+
+        .file-upload {
+            display: inline-block;
+            position: relative;
+        }
+
+        .file-upload input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .status {
+            color: green;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        tr:hover {
+            background-color: #f1f9ff;
+        }
+
+        .logout-btn {
+            background-color: #f44336;
+        }
+
+        .logout-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        /* Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 80%;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard">
+    <h1>Admin Dashboard</h1>
+
+    <div class="button-group">
+        <button onclick="runPayroll()">Run Payroll</button>
+
+        <div class="file-upload">
+            <button>Upload User Excel</button>
+            <input type="file" accept=".xlsx,.xls" onchange="uploadExcel(event)" />
+        </div>
+
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="status" id="statusMessage"></div>
+
+    <h2>User Table</h2>
+    <table id="userTable">
+        <thead>
+        <tr>
+            <th>Serial No</th>
+            <th>User ID</th>
+            <th>Screen Name</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- User data will be inserted here -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal -->
+<div id="payrollModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Select a User to Run Payroll</h2>
+        <table id="payrollTable">
+            <thead>
+            <tr>
+                <th>Select</th>
+                <th>Serial No</th>
+                <th>User ID</th>
+                <th>Screen Name</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Modal user data will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function loadUsers() {
+        fetch('/api/users')
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to load users.');
+                return res.json();
+            })
+            .then(users => {
+                const tbody = document.getElementById('userTable').querySelector('tbody');
+                tbody.innerHTML = '';
+                users.forEach((user, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+              <td>${user.id}</td>
+              <td>${user.name}</td>
+              <td>${user.email}</td>
+              <td>${user.role}</td>
+              <td>${user.status}</td>
+            `;
+                    tbody.appendChild(row);
+                });
+            })
+            .catch(err => {
+                document.getElementById('statusMessage').innerText = 'User load failed: ' + err.message;
+            });
+    }
+
+    function runPayroll() {
+        document.getElementById("payrollModal").style.display = "block";
+        fetch('/api/users')
+            .then(res => res.json())
+            .then(users => {
+                const tbody = document.getElementById('payrollTable').querySelector('tbody');
+                tbody.innerHTML = '';
+                users.forEach((user, index) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+              <td><input type="radio" name="selectedUser" value="${user.userId}" /></td>
+              <td>${user.id}</td>
+              <td>${user.name}</td>
+              <td>${user.email}</td>
+              <td>${user.role}</td>
+              <td>${user.status}</td>
+            `;
+                    tbody.appendChild(row);
+                });
+            })
+            .catch(err => {
+                alert('Error loading payroll data: ' + err.message);
+            });
+    }
+
+    function closeModal() {
+        document.getElementById("payrollModal").style.display = "none";
+    }
+
+    function uploadExcel(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        fetch('/api/uploadExcel', {
+            method: 'POST',
+            body: formData
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('Upload failed.');
+                return res.json();
+            })
+            .then(() => {
+                document.getElementById('statusMessage').innerText = 'Excel uploaded successfully.';
+            })
+            .catch(err => {
+                document.getElementById('statusMessage').innerText = 'Error: ' + err.message;
+            });
+    }
+
+    function logout() {
+        window.location.href = '/login.html';
+    }
+
+    document.addEventListener('DOMContentLoaded', loadUsers);
+</script>
+</body>
+</html>
