@@ -94,17 +94,16 @@
     <div class="actions">
         <button onclick="logout()">Logout</button>
         <button onclick="changePassword()">Change Password</button>
-        <button onclick="goToPrintPage()">Print</button>
+        <button onclick="getUserProfile()">View Profile</button>
     </div>
 
     <table id="userTable">
         <thead>
         <tr>
             <th>User ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Status</th>
+            <th>Company Name</th>
+            <th>Payroll Month</th>
+            <th>Credited Amount</th>
         </tr>
         </thead>
         <tbody>
@@ -125,10 +124,9 @@
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
               <td>${user.id}</td>
-              <td>${user.name}</td>
-              <td>${user.email}</td>
-              <td>${user.role}</td>
-              <td>${user.status}</td>
+              <td>${user.comapnyname}</td>
+              <td>${user.payrollmonth}</td>
+              <td>${user.creditedAmount}</td>
             `;
                     tbody.appendChild(tr);
                 });
@@ -155,8 +153,8 @@
             });
     }
 
-    function goToPrintPage() {
-        window.location.href = 'print.html';
+    function getUserProfile() {
+        window.location.href = '/api/getuserProfile';
     }
     function logout(){
         window.location.href = '/api/portal';

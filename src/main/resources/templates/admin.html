@@ -5,13 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Admin Dashboard</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body {
             background: linear-gradient(120deg, #74ebd5, #acb6e5);
             min-height: 100vh;
@@ -20,7 +14,6 @@
             align-items: flex-start;
             padding: 2rem;
         }
-
         .dashboard {
             background-color: #fff;
             padding: 30px 40px;
@@ -28,18 +21,8 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
             width: 1000px;
         }
-
-        h1 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .button-group {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
+        h1 { color: #333; text-align: center; margin-bottom: 25px; }
+        .button-group { text-align: center; margin-bottom: 20px; }
         button {
             background-color: #4e9af1;
             color: #fff;
@@ -51,94 +34,44 @@
             cursor: pointer;
             transition: background-color 0.3s ease;
         }
-
-        button:hover {
-            background-color: #357ae8;
-        }
-
-        .file-upload {
-            display: inline-block;
-            position: relative;
-        }
-
-        .file-upload input[type="file"] {
-            position: absolute;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
-
-        .status {
-            color: green;
-            text-align: center;
-            margin-top: 10px;
-        }
-
+        button:hover { background-color: #357ae8; }
+        .logout-btn { background-color: #f44336; }
+        .logout-btn:hover { background-color: #d32f2f; }
+        .status { color: green; text-align: center; margin-top: 10px; }
         table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            border-radius: 10px;
-            overflow: hidden;
+            width: 100%; border-collapse: collapse; margin-top: 20px;
+            border-radius: 10px; overflow: hidden;
         }
-
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f4f4f4; }
+        tr:hover { background-color: #f1f9ff; }
+        .view-icon {
+            color: #007bff;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 18px;
         }
-
-        th {
-            background-color: #f4f4f4;
-        }
-
-        tr:hover {
-            background-color: #f1f9ff;
-        }
-
-        .logout-btn {
-            background-color: #f44336;
-        }
-
-        .logout-btn:hover {
-            background-color: #d32f2f;
-        }
-
-        /* Modal Styling */
         .modal {
             display: none;
             position: fixed;
             z-index: 10;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.5);
         }
-
         .modal-content {
             background-color: #fff;
             margin: 5% auto;
             padding: 30px;
             border-radius: 20px;
-            width: 80%;
+            width: 600px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
             animation: slideIn 0.3s ease;
         }
-
         @keyframes slideIn {
-            from {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
-
         .close {
             color: #aaa;
             float: right;
@@ -146,86 +79,106 @@
             font-weight: bold;
             cursor: pointer;
         }
-
-        .close:hover {
-            color: #000;
-        }
+        .close:hover { color: #000; }
+        .profile-content p { margin: 8px 0; font-size: 16px; }
     </style>
 </head>
 <body>
 <div class="dashboard">
     <h1>Admin Dashboard</h1>
-
     <div class="button-group">
         <button onclick="runPayroll()">Run Payroll</button>
-
-        <div class="file-upload">
-            <button>Upload User Excel</button>
-            <input type="file" accept=".xlsx,.xls" onchange="uploadExcel(event)" />
-        </div>
-
+        <button onclick="document.getElementById('fileInput').click()">Upload User Excel</button>
+        <input type="file" id="fileInput" accept=".xlsx,.xls" onchange="uploadExcel(event)" style="display: none;" />
         <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
-
     <div class="status" id="statusMessage"></div>
-
     <h2>User Table</h2>
     <table id="userTable">
         <thead>
         <tr>
             <th>Serial No</th>
-            <th>User ID</th>
-            <th>Screen Name</th>
-            <th>Status</th>
+            <th>Employee Name</th>
+            <th>Company Name</th>
+            <th>Department</th>
+            <th>Designation</th>
+            <th>View Profile</th>
         </tr>
         </thead>
-        <tbody>
-        <!-- User data will be inserted here -->
-        </tbody>
+        <tbody></tbody>
     </table>
 </div>
 
-<!-- Modal -->
+<!-- Profile Modal -->
+<div id="profileModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeProfileModal()">&times;</span>
+        <h2>User Profile</h2>
+        <div class="profile-content">
+            <p><strong>EmployeeName:</strong> <span id="profileEmployeeName"></span></p>
+            <p><strong>CompanyName:</strong> <span id="profileCompanyName"></span></p>
+            <p><strong>Department:</strong> <span id="profileDepartment"></span></p>
+            <p><strong>Designation:</strong> <span id="profileDesignation"></span></p>
+            <p><strong>Uan No:</strong> <span id="profileUANNo"></span></p>
+            <p><strong>PF.No:</strong> <span id="profilePFNo"></span></p>
+            <p><strong>ESI.No:</strong> <span id="profileESINo"></span></p>
+            <p><strong>Total Days:</strong> <span id="profileTotalDays"></span></p>
+            <p><strong>Payable Days:</strong> <span id="profilePayableDays"></span></p>
+            <p><strong>W /Off:</strong> <span id="profilewoff"></span></p>
+            <p><strong>Gross Salary:</strong> <span id="profileGrossSalary"></span></p>
+            <p><strong>Basic Salary:</strong> <span id="profileBasicSalary"></span></p>
+            <p><strong>Bank Name:</strong> <span id="profileBankName"></span></p>
+            <p><strong>Bank Account No:</strong> <span id="profileBankAccountNo"></span></p>
+            <p><strong>IFSC Code:</strong> <span id="profileIFSCCode"></span></p>
+        </div>
+    </div>
+</div>
+
+<!-- Payroll Modal -->
 <div id="payrollModal" class="modal">
     <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
+        <span class="close" onclick="closePayrollModal()">&times;</span>
         <h2>Select a User to Run Payroll</h2>
-        <table id="payrollTable">
+        <table>
             <thead>
             <tr>
                 <th>Select</th>
                 <th>Serial No</th>
-                <th>User ID</th>
-                <th>Screen Name</th>
-                <th>Status</th>
+                <th>Employee Name</th>
+                <th>Company Name</th>
+                <th>Department</th>
+                <th>Designation</th>
+                <th>View Profile</th>
             </tr>
             </thead>
-            <tbody>
-            <!-- Modal user data will be inserted here -->
-            </tbody>
+            <tbody id="payrollTableBody"></tbody>
         </table>
+        <br />
+        <button onclick="submitPayroll()">Run Payroll</button>
     </div>
 </div>
 
 <script>
+    let selectedPayrollUserId = null;
+
     function loadUsers() {
         fetch('/api/users')
-            .then(res => {
-                if (!res.ok) throw new Error('Failed to load users.');
-                return res.json();
-            })
+            .then(res => res.json())
             .then(users => {
-                const tbody = document.getElementById('userTable').querySelector('tbody');
+                const tbody = document.querySelector('#userTable tbody');
                 tbody.innerHTML = '';
                 users.forEach((user, index) => {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-              <td>${user.id}</td>
-              <td>${user.name}</td>
-              <td>${user.email}</td>
-              <td>${user.role}</td>
-              <td>${user.status}</td>
-            `;
+            <td>${index + 1}</td>
+            <td>${user.EmployeeName}</td>
+            <td>${user.CompanyName}</td>
+            <td>${user.Department}</td>
+            <td>${user.Designation}</td>
+            <td>
+              <span class="view-icon" onclick="viewUserProfile('${user.EmployeeName}')">👁️</span>
+            </td>
+          `;
                     tbody.appendChild(row);
                 });
             })
@@ -234,50 +187,82 @@
             });
     }
 
-    function runPayroll() {
-        document.getElementById("payrollModal").style.display = "block";
-        fetch('/api/users')
+    function viewUserProfile(userId) {
+        fetch(`/api/user-profile?userId=${userId}`)
             .then(res => res.json())
-            .then(users => {
-                const tbody = document.getElementById('payrollTable').querySelector('tbody');
-                tbody.innerHTML = '';
-                users.forEach((user, index) => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-              <td><input type="radio" name="selectedUser" value="${user.userId}" /></td>
-              <td>${user.id}</td>
-              <td>${user.name}</td>
-              <td>${user.email}</td>
-              <td>${user.role}</td>
-              <td>${user.status}</td>
-            `;
-                    tbody.appendChild(row);
-                });
+            .then(user => {
+                document.getElementById('profileEmployeeName').innerText = user.EmployeeName || 'N/A';
+                document.getElementById('profileCompanyName').innerText = user.CompanyName || '-';
+                document.getElementById('profileDepartment').innerText = user.Department || '-';
+                document.getElementById('profileDesignation').innerText = user.Designation || '-';
+                document.getElementById('profileUANNo').innerText = user.UanNo || '-';
+                document.getElementById('profilePFNo').innerText = user.PFNo || '-';
+                document.getElementById('profileESINo').innerText = user.ESINo || '-';
+                document.getElementById('profileTotalDays').innerText = user.TotalDays || '-';
+                document.getElementById('profilePayableDays').innerText = user.PayableDays || '-';
+                document.getElementById('profilewoff').innerText = user.WOff || '-';
+                document.getElementById('profileGrossSalary').innerText = user.GrossSalary || '-';
+                document.getElementById('profileBasicSalary').innerText = user.BasicSalary || '-';
+                document.getElementById('profileBankName').innerText = user.BankName || '-';
+                document.getElementById('profileBankAccountNo').innerText = user.BankAccountNo || '-';
+                document.getElementById('profileIFSCCode').innerText = user.IFSCCode || '-';
+                document.getElementById('profileModal').style.display = 'block';
             })
-            .catch(err => {
-                alert('Error loading payroll data: ' + err.message);
+            .catch(() => {
+                alert('Failed to load user profile');
             });
     }
 
-    function closeModal() {
-        document.getElementById("payrollModal").style.display = "none";
+    function closeProfileModal() {
+        document.getElementById('profileModal').style.display = 'none';
+    }
+
+    function runPayroll() {
+        document.getElementById('payrollModal').style.display = 'block';
+        fetch('/api/users')
+            .then(res => res.json())
+            .then(users => {
+                const tbody = document.getElementById('payrollTableBody');
+                tbody.innerHTML = '';
+                users.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+            <td><input type="radio" name="payrollUser" value="${user.userId}" onclick="selectPayrollUser('${user.userId}')"></td>
+            <td>${user.userId}</td>
+            <td>${user.email}</td>
+            <td>${user.role}</td>
+          `;
+                    tbody.appendChild(row);
+                });
+            });
+    }
+
+    function selectPayrollUser(userId) {
+        selectedPayrollUserId = userId;
+    }
+
+    function submitPayroll() {
+        if (!selectedPayrollUserId) {
+            alert('Please select a user to run payroll.');
+            return;
+        }
+        // Submit to backend here
+        alert(`Payroll submitted for User ID: ${selectedPayrollUserId}`);
+        closePayrollModal();
+    }
+
+    function closePayrollModal() {
+        document.getElementById('payrollModal').style.display = 'none';
+        selectedPayrollUserId = null;
     }
 
     function uploadExcel(event) {
         const file = event.target.files[0];
         if (!file) return;
-
         const formData = new FormData();
         formData.append('file', file);
-
-        fetch('/api/uploadExcel', {
-            method: 'POST',
-            body: formData
-        })
-            .then(res => {
-                if (!res.ok) throw new Error('Upload failed.');
-                return res.json();
-            })
+        fetch('/api/uploadExcel', { method: 'POST', body: formData })
+            .then(res => res.json())
             .then(() => {
                 document.getElementById('statusMessage').innerText = 'Excel uploaded successfully.';
             })
@@ -287,7 +272,7 @@
     }
 
     function logout() {
-        window.location.href = '/login.html';
+        window.location.href = '/api/portal';
     }
 
     document.addEventListener('DOMContentLoaded', loadUsers);
